@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cryptography Techniques</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .intro {
+            text-align: center;
+            color: #555;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            margin-top: 0;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 6px;
+            font-weight: bold;
+        }
+
+        textarea,
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 15px;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        button {
+            padding: 10px 18px;
+            margin-top: 15px;
+            margin-right: 8px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover {
+            opacity: 0.85;
+        }
+
+        .output {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f0f0f0;
+            border-radius: 6px;
+            min-height: 50px;
+            word-wrap: break-word;
+        }
+
+        footer {
+            text-align: center;
+            color: #666;
+            margin-top: 25px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Cryptography Techniques</h1>
+
+    <p class="intro">
+        A simple application demonstrating Caesar Cipher and Vigenère Cipher.
+    </p>
+
+    <!-- Caesar Cipher -->
+    <div class="card">
+
+        <h2>1. Caesar Cipher</h2>
+
+        <p>
+            Caesar Cipher is a substitution cipher that shifts letters
+            by a fixed number.
+        </p>
+
+        <label for="caesarInput">Input Message:</label>
+
+        <textarea id="caesarInput"
+            placeholder="Enter your message...">DORSU ANGELAH LIDO CAINTANG</textarea>
+
+        <label for="shift">Shift:</label>
+
+        <input type="number" id="shift" value="3">
+
+        <button onclick="caesarEncrypt()">Encrypt</button>
+        <button onclick="caesarDecrypt()">Decrypt</button>
+
+        <label>Output:</label>
+
+        <div class="output" id="caesarOutput">
+            Your result will appear here.
+        </div>
+
+    </div>
+
+
+    <!-- Vigenere Cipher -->
+    <div class="card">
+
+        <h2>2. Vigenère Cipher</h2>
+
+        <p>
+            Vigenère Cipher uses a keyword to encrypt the message.
+        </p>
+
+        <label for="vigenereInput">Input Message:</label>
+
+        <textarea id="vigenereInput"
+            placeholder="Enter your message...">DORSU ANGELAH LIDO CAINTANG</textarea>
+
+        <label for="keyword">Keyword:</label>
+
+        <input type="text" id="keyword"
+            placeholder="Enter keyword..."
+            value="CRYPTO">
+
+        <button onclick="vigenereEncrypt()">Encrypt</button>
+        <button onclick="vigenereDecrypt()">Decrypt</button>
+
+        <label>Output:</label>
+
+        <div class="output" id="vigenereOutput">
+            Your result will appear here.
+        </div>
+
+    </div>
+
+
+    <footer>
+        Cryptography Application
+    </footer>
+
+</div>
+
+
+<script>
+
+    // =========================
+    // CAESAR CIPHER
+    // =========================
+
+    function caesarCipher(text, shift) {
+
+        return text.split('').map(function(char) {
+
+            if (char >= 'A' && char <= 'Z') {
+
+                return String.fromCharCode(
+                    (char.charCodeAt(0) - 65 + shift + 26) % 26 + 65
+                );
+
+            }
+
+            if (char >= 'a' && char <= 'z') {
+
+                return String.fromCharCode(
+                    (char.charCodeAt(0) - 97 + shift + 26) % 26 + 97
+                );
+
+            }
+
+            return char;
+
+        }).join('');
+    }
+
+
+    function caesarEncrypt() {
+
+        const text = document.getElementById("caesarInput").value;
+        const shift = parseInt(document.getElementById("shift").value) || 0;
+
+        const result = caesarCipher(text, shift);
+
+        document.getElementById("caesarOutput").textContent = result;
+    }
+
+
+    function caesarDecrypt() {
+
+        const text = document.getElementById("caesarInput").value;
+        const shift = parseInt(document.getElementById("shift").value) || 0;
+
+        const result = caesarCipher(text, -shift);
+
+        document.getElementById("caesarOutput").textContent = result;
+    }
+
+
+    // =========================
+    // VIGENERE CIPHER
+    // =========================
+
+    function vigenereCipher(text, key, decrypt) {
+
+        key = key.toUpperCase().replace(/[^A-Z]/g, "");
+
+        if (key.length === 0) {
+            return "Please enter a valid keyword.";
+        }
+
+        let result = "";
+        let keyIndex = 0;
+
+        for (let i = 0; i < text.length; i++) {
+
+            let char = text[i];
+
+            if (/[A-Za-z]/.test(char)) {
+
+                let base = char === char.toUpperCase()
+                    ? 65
+                    : 97;
+
+                let letter = char.charCodeAt(0) - base;
+                let keyValue = key.charCodeAt(keyIndex % key.length) - 65;
+
+                if (decrypt) {
+                    letter = (letter - keyValue + 26) % 26;
+                } else {
+                    letter = (letter + keyValue) % 26;
+                }
+
+                result += String.fromCharCode(letter + base);
+
+                keyIndex++;
+
+            } else {
+
+                result += char;
+            }
+        }
+
+        return result;
+    }
+
+
+    function vigenereEncrypt() {
+
+        const text = document.getElementById("vigenereInput").value;
+        const key = document.getElementById("keyword").value;
+
+        const result = vigenereCipher(text, key, false);
+
+        document.getElementById("vigenereOutput").textContent = result;
+    }
+
+
+    function vigenereDecrypt() {
+
+        const text = document.getElementById("vigenereInput").value;
+        const key = document.getElementById("keyword").value;
+
+        const result = vigenereCipher(text, key, true);
+
+        document.getElementById("vigenereOutput").textContent = result;
+    }
+
+</script>
+
+</body>
+</html>
